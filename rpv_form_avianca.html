@@ -1,94 +1,159 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RPV • Avianca Cargo</title>
+  <title>RPV - Avianca Cargo</title>
   <style>
-    body {font-family: Arial, sans-serif; margin: 0; padding: 20px; background:#fff}
-    h1  {color:#d71920; text-align:center}
-    .field {margin-bottom:15px}
-    label {display:block; font-weight:bold}
-    input, textarea, select {width:100%; padding:8px; border:1px solid #ccc; border-radius:4px}
-    button {background:#d71920; color:#fff; padding:10px 20px; border:none; border-radius:4px; font-weight:bold}
+    body {
+      font-family: Arial, sans-serif;
+      background: #ffffff;
+      padding: 20px;
+      color: #000000;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      color: #d71920;
+      text-align: center;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 200px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="date"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+    }
+    input[type="file"] {
+      border: none;
+    }
+    button {
+      background-color: #d71920;
+      color: #ffffff;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #b9151b;
+    }
+    .checkbox-label {
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+    }
+    .checkbox-label input {
+      margin-right: 8px;
+    }
   </style>
 </head>
 <body>
   <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Avianca_Cargo_logo.svg"
-       alt="Avianca Cargo" style="width:160px; display:block; margin:0 auto 10px" />
+       alt="Avianca Cargo" class="logo" />
   <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
 
   <form id="rpvForm">
-    <div class="field">
-      <label>Fecha</label>
-      <input type="date" name="fecha" required />
+    <div class="form-group">
+      <label for="fecha">Fecha del incidente</label>
+      <input type="date" name="fecha" id="fecha" required />
     </div>
 
-    <div class="field">
-      <label>
-        Nombre
-        <input type="checkbox" id="anon" /> <small>Confidencial</small>
+    <div class="form-group">
+      <label for="nombre">Nombre</label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="anon" /> Marcar como confidencial
       </label>
-      <input type="text" name="nombre" id="nombreInput" />
+      <input type="text" name="nombre" id="nombreInput" placeholder="Tu nombre" />
     </div>
 
-    <div class="field">
-      <label>Cargo</label>
-      <input type="text" name="cargo" />
+    <div class="form-group">
+      <label for="cargo">Cargo</label>
+      <input type="text" name="cargo" id="cargo" placeholder="Ej: Coordinador de carga" />
     </div>
 
-    <div class="field">
-      <label>Descripción del peligro</label>
-      <textarea name="descripcion" rows="4" required></textarea>
+    <div class="form-group">
+      <label for="descripcion">Descripción del peligro</label>
+      <textarea name="descripcion" id="descripcion" rows="4" placeholder="Describe lo sucedido..." required></textarea>
     </div>
 
-    <div class="field">
-      <label>Evidencia (imágenes / PDF / video)</label>
-      <input type="file" name="files" multiple />
+    <div class="form-group">
+      <label for="files">Evidencia (opcional)</label>
+      <input type="file" name="files" id="files" multiple accept="image/*,application/pdf,video/*" />
     </div>
 
-    <button type="submit">Enviar</button>
+    <button type="submit">Enviar reporte</button>
   </form>
 
   <script>
-    // Oculta/borra nombre si marcan confidencial
-    document.getElementById('anon').addEventListener('change', e=>{
+    // Desactiva el campo de nombre si marcan confidencial
+    document.getElementById('anon').addEventListener('change', e => {
       const n = document.getElementById('nombreInput');
-      if(e.target.checked){ n.value=''; n.disabled=true; }
-      else { n.disabled=false; }
+      if (e.target.checked) { n.value = ''; n.disabled = true; }
+      else { n.disabled = false; }
     });
 
+    // URL de tu Apps Script
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzFQw-n2YPdfnI8NbOX7_Psrp5k4f9b5d6G12zTv5Z3Cuooi87eElxy1fE96MBXdGmJdw/exec';
 
-    document.getElementById('rpvForm').addEventListener('submit', async e=>{
+    document.getElementById('rpvForm').addEventListener('submit', async e => {
       e.preventDefault();
       const form = e.target;
       const data = new FormData(form);
-      // Convierte archivos a base64
+
+      // Convertir archivos a Base64
       const files = [];
-      for(const f of data.getAll('files')){
-        if(f.size>0){
+      for (const f of data.getAll('files')) {
+        if (f.size > 0) {
           const b64 = await f.arrayBuffer()
-            .then(buf=>btoa(String.fromCharCode(...new Uint8Array(buf))));
-          files.push({name:f.name, mimeType:f.type, base64:b64});
+            .then(buf => btoa(String.fromCharCode(...new Uint8Array(buf))));
+          files.push({ name: f.name, mimeType: f.type, base64: b64 });
         }
       }
+
       const payload = {
-        fecha:data.get('fecha'),
-        nombre:data.get('nombre'),
-        cargo:data.get('cargo'),
-        descripcion:data.get('descripcion'),
-        anonimo:document.getElementById('anon').checked,
+        fecha: data.get('fecha'),
+        nombre: data.get('nombre'),
+        cargo: data.get('cargo'),
+        descripcion: data.get('descripcion'),
+        anonimo: document.getElementById('anon').checked,
         files
       };
 
-      await fetch(scriptURL,{
-        method:'POST',
-        body:JSON.stringify(payload),
-        headers:{'Content-Type':'application/json'}
-      });
-      alert('✅ ¡Reporte enviado!'); form.reset();
+      try {
+        await fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' }
+        });
+        alert('✅ ¡Reporte enviado con éxito!');
+        form.reset();
+        document.getElementById('nombreInput').disabled = false;
+      } catch (error) {
+        alert('❌ Error al enviar el reporte.');
+        console.error(error);
+      }
     });
   </script>
 </body>
