@@ -32,20 +32,15 @@
     }
     input[type="text"],
     input[type="date"],
-    textarea,
-    select {
+    textarea {
       width: 100%;
       padding: 10px;
       border-radius: 5px;
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
-    textarea {
-      resize: vertical;
-    }
-    input[type="file"] {
-      border: none;
-    }
+    textarea { resize: vertical; }
+    input[type="file"] { border: none; }
     button {
       background-color: #d71920;
       color: #ffffff;
@@ -56,22 +51,20 @@
       font-size: 16px;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #b9151b;
-    }
+    button:hover { background-color: #b9151b; }
     .checkbox-label {
       font-weight: normal;
       display: flex;
       align-items: center;
     }
-    .checkbox-label input {
-      margin-right: 8px;
-    }
+    .checkbox-label input { margin-right: 8px; }
   </style>
 </head>
 <body>
-  <img src="https://raw.githubusercontent.com/JuanCamiloTibaduiza/avianca-rpv-demo/main/logo_avianca_cargo.png"
+  <!-- Logo incrustado en Base64 -->
+  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAAfCAYAAACuU8btAAAACXBIWXMAAAsSAAALEgHS3X78AAABlklEQVRIS+2WwU3CMBBGZ+W8U4FCUAEKIAUoQAVKACqgA6gAtSAFSgA6hAlCBcOqXM6O2cSfMduOeGZ1L6pv7YZNAe9hAcMcAw2gzeyUk3AG3AicRUwM3JTAxCAl+Whhe4TRhZYiQ8AewrGzCpURjDvNC8iqSo1uwAnCwSJKDp4BvwWPN7EWzWNe8UqUGSvQ0MiJ4QhN5kF97ihYOY1WZlz3CbpZgDkZGMl6k+hgAHWQxEccZzR4YAzkeWi5Xdf6ccDNxtRJEWZ6tQA9eDmfZ28B0kWmg0kt62ZYU0CXAVoNUcPJBbqT9hM7HmjVu5kbzeXlOkGBgjI5qRYsOpYvmuvqGiRHrA/fU9HuT3l3F3nzReKP2D9gux+Rg7Q9ebv5V1p1T8sRHYHJkMG0s4YBaT5n+QzyYymQGiZp6AAAAAElFTkSuQmCC"
        alt="Avianca Cargo" class="logo" />
+
   <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
 
   <form id="rpvForm">
