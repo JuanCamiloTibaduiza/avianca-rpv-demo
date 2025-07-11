@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RPV – Avianca Cargo</title>
 <style>
  body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000;padding:20px;max-width:600px;margin:auto}
@@ -42,7 +42,7 @@
 </form>
 
 <script>
-const scriptURL = 'PON_AQUI_TU_URL_EXEC';
+const scriptURL='https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
 
 document.getElementById('anon').addEventListener('change',e=>{
   const n=document.getElementById('nombreInput');
@@ -71,15 +71,9 @@ document.getElementById('rpvForm').addEventListener('submit',async e=>{
     files
   };
 
-  await fetch(scriptURL,{
-    method:'POST',
-    mode:'no-cors',
-    body:JSON.stringify(payload)
-  });
-
+  await fetch(scriptURL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});
   alert('✅ ¡Reporte enviado!');
-  e.target.reset();
-  document.getElementById('nombreInput').disabled=false;
+  e.target.reset(); document.getElementById('nombreInput').disabled=false;
 });
 </script>
 </body>
