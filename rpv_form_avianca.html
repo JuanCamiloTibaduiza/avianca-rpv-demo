@@ -107,15 +107,14 @@
       else { n.disabled = false; }
     });
 
-    // URL de tu Apps Script
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzTA1k8dAF_YggXJkq0IKKcve_7YZJMYDMaGhrnajhFi8txXE_IoPOv4e3vi1YbQtMhjA/exec";
+    // ✅ Asegúrate de reemplazar con tu URL real de implementación (terminada en /exec)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwc1ez9QJ4An0nevBj1VdiZJp4zmZXUC9hTvkPJkPN7v_6ccFPEvjaDixPE3ItqgO0/exec';
 
     document.getElementById('rpvForm').addEventListener('submit', async e => {
       e.preventDefault();
       const form = e.target;
       const data = new FormData(form);
 
-      // Convertir archivos a Base64
       const files = [];
       for (const f of data.getAll('files')) {
         if (f.size > 0) {
@@ -137,6 +136,7 @@
       try {
         await fetch(scriptURL, {
           method: 'POST',
+          mode: 'no-cors', // ← importante para evitar bloqueo por CORS
           body: JSON.stringify(payload),
           headers: { 'Content-Type': 'application/json' }
         });
