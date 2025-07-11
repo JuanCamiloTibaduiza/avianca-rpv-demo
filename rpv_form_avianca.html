@@ -51,12 +51,16 @@
 <script>
 const scriptURL='https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
 const overlay=document.getElementById('overlay');
+let delayHandle=null;            // para el aviso de 2 s
 
+// Confidencial
 document.getElementById('anon').addEventListener('change',e=>{
   const n=document.getElementById('nombreInput');
   if(e.target.checked){
-    n.value=''; n.disabled=true;
-  }else{ n.disabled=false; }
+    n.value=''; n.disabled=true; n.style.background='#f2f2f2';
+  }else{
+    n.disabled=false; n.style.background='#ffffff';
+  }
 });
 
 document.getElementById('rpvForm').addEventListener('submit',async e=>{
@@ -68,13 +72,14 @@ document.getElementById('rpvForm').addEventListener('submit',async e=>{
   const d=new FormData(e.target);
   const filesInput=document.getElementById('files');
 
-  // Validación de tamaño
-  let totalSize=0;
-  for(const f of filesInput.files){ totalSize+=f.size; }
-  if(totalSize>15*1024*1024){ alert('El total de adjuntos supera 15 MB.');return; }
+  // Límite total 15 MB
+  let total=0; for(const f of filesInput.files){ total+=f.size;}
+  if(total>15*1024*1024){ alert('El total de adjuntos supera 15 MB.'); return;}
+
+  // Mostrar overlay SOLO si tarda >2 s
+  delayHandle=setTimeout(()=>overlay.style.display='flex',2000);
 
   const files=[];
-  overlay.style.display='flex';                // Muestra overlay
   for(const f of filesInput.files){
     if(f.size>10*1024*1024){ alert(`Archivo ${f.name} excede 10 MB y se omite.`);continue;}
     const b64=await f.arrayBuffer()
@@ -92,9 +97,11 @@ document.getElementById('rpvForm').addEventListener('submit',async e=>{
   };
 
   await fetch(scriptURL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});
-  overlay.style.display='none';                // Oculta overlay
+
+  clearTimeout(delayHandle); overlay.style.display='none';
   alert('✅ ¡Reporte enviado!');
   e.target.reset(); document.getElementById('nombreInput').disabled=false;
+  document.getElementById('nombreInput').style.background='#ffffff';
 });
 </script>
 </body>
