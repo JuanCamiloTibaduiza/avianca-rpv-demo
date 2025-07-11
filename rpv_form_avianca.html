@@ -26,15 +26,7 @@
     .checkbox-label input, .accept-label input {
       margin-right: 8px;
     }
-    #progressContainer {
-      display: none; margin-top: 10px;
-    }
-    #progressBar {
-      height: 14px; background: #d52b1e; width: 0%; border-radius: 3px;
-    }
-    #progressWrapper {
-      width: 100%; background: #eee; border-radius: 3px;
-    }
+    #status { text-align: center; margin-top: 10px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -67,7 +59,7 @@
   </div>
 
   <div class="form-group">
-    <label>Evidencia (PDF/imagen/video, máx 20 MB c/u)</label>
+    <label>Evidencia (PDF/imagen/video, máx 10 MB c/u)</label>
     <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*">
   </div>
 
@@ -78,11 +70,7 @@
   </div>
 
   <button type="submit">Enviar reporte</button>
-
-  <div id="progressContainer">
-    <div id="progressWrapper"><div id="progressBar"></div></div>
-    <small id="progressText">0%</small>
-  </div>
+  <div id="status"></div>
 </form>
 
 <script>
@@ -91,9 +79,7 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1Syivf
 const form = document.getElementById('rpvForm');
 const anon = document.getElementById('anon');
 const nombreInput = document.getElementById('nombreInput');
-const progressContainer = document.getElementById('progressContainer');
-const progressBar = document.getElementById('progressBar');
-const progressText = document.getElementById('progressText');
+const status = document.getElementById('status');
 
 anon.addEventListener('change', e => {
   if (e.target.checked) {
@@ -108,8 +94,9 @@ anon.addEventListener('change', e => {
   }
 });
 
-form.addEventListener('submit', e => {
+form.addEventListener('submit', async e => {
   e.preventDefault();
+  status.textContent = '⏳ Enviando...';
   if (!document.getElementById('acepto').checked) {
     alert('Debe aceptar el tratamiento de datos.');
     return;
@@ -118,42 +105,23 @@ form.addEventListener('submit', e => {
   const fd = new FormData(form);
   fd.append('anonimo', anon.checked);
 
-  progressContainer.style.display = 'block';
-  progressBar.style.width = '0%';
-  progressText.textContent = '0%';
+  try {
+    await fetch(scriptURL, {
+      method: 'POST',
+      body: fd,
+      mode: 'no-cors' // ← importante para evitar CORS
+    });
 
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', scriptURL, true);
+    status.textContent = '✅ ¡Reporte enviado!';
+    form.reset();
+    nombreInput.disabled = false;
+    nombreInput.placeholder = 'Ej: Juan Pérez';
+    nombreInput.style.background = '#ffffff';
 
-  xhr.upload.onprogress = evt => {
-    if (evt.lengthComputable) {
-      const percent = Math.round((evt.loaded / evt.total) * 100);
-      progressBar.style.width = percent + '%';
-      progressText.textContent = percent + '%';
-    }
-  };
-
-  xhr.onload = () => {
-    if (xhr.status === 200 || xhr.status === 0) {
-      progressBar.style.width = '100%';
-      progressText.textContent = '100%';
-      alert('✅ ¡Reporte enviado!');
-      form.reset();
-      nombreInput.disabled = false;
-      nombreInput.placeholder = 'Ej: Juan Pérez';
-      nombreInput.style.background = '#ffffff';
-      setTimeout(() => progressContainer.style.display = 'none', 800);
-    } else {
-      alert('❌ Error al enviar el reporte.');
-    }
-  };
-
-  xhr.onerror = () => {
-    alert('❌ Error al subir.');
-    progressContainer.style.display = 'none';
-  };
-
-  xhr.send(fd);
+    setTimeout(() => status.textContent = '', 3000);
+  } catch (err) {
+    status.textContent = '❌ Error al enviar el reporte';
+  }
 });
 </script>
 </body>
