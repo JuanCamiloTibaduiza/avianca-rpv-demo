@@ -1,4 +1,3 @@
-<!-- SOLO pega todo este bloque HTML en tu archivo -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,9 +14,12 @@
  button:hover{background:#b9151b}
  .checkbox-label,.accept-label{display:flex;align-items:center;font-weight:normal}
  .checkbox-label input,.accept-label input{margin-right:8px}
+ #overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;z-index:99;display:none}
 </style>
 </head>
 <body>
+<div id="overlay">⏳ Subiendo archivos, por favor espera…</div>
+
 <img class="logo" src="https://raw.githubusercontent.com/JuanCamiloTibaduiza/avianca-rpv-demo/main/logo_avianca_cargo.png" alt="Avianca Cargo">
 <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
 
@@ -27,16 +29,15 @@
 
   <div class="form-group"><label>Nombre</label>
     <label class="checkbox-label"><input type="checkbox" id="anon"> Confidencial</label>
-    <!-- Cambiamos a readonly, no disabled -->
-    <input id="nombreInput" name="nombre" type="text"></div>
+    <input id="nombreInput" name="nombre" type="text" placeholder="Ej: Juan Pérez"></div>
 
   <div class="form-group"><label>Cargo
-    <input name="cargo" type="text"></label></div>
+    <input name="cargo" type="text" placeholder="Ej: Coordinador de carga"></label></div>
 
   <div class="form-group"><label>Descripción del peligro
-    <textarea name="descripcion" rows="4" required></textarea></label></div>
+    <textarea name="descripcion" rows="4" placeholder="Ej: Falla en procedimiento de estiba…" required></textarea></label></div>
 
-  <div class="form-group"><label>Evidencia (máx 5 MB por archivo, opcional)
+  <div class="form-group"><label>Evidencia (PDF/imagen/video, máx 10 MB c/u)
     <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*"></label></div>
 
   <div class="form-group">
@@ -49,51 +50,51 @@
 
 <script>
 const scriptURL='https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
+const overlay=document.getElementById('overlay');
 
 document.getElementById('anon').addEventListener('change',e=>{
   const n=document.getElementById('nombreInput');
   if(e.target.checked){
-    n.value='Anónimo';
-    n.readOnly=true;
-  }else{
-    n.value='';
-    n.readOnly=false;
-  }
+    n.value=''; n.disabled=true;
+  }else{ n.disabled=false; }
 });
 
 document.getElementById('rpvForm').addEventListener('submit',async e=>{
   e.preventDefault();
   if(!document.getElementById('acepto').checked){
-    alert('Debe aceptar el tratamiento de datos.');
-    return;
+    alert('Debe aceptar el tratamiento de datos.');return;
   }
 
-  const fdata=new FormData(e.target);
+  const d=new FormData(e.target);
   const filesInput=document.getElementById('files');
+
+  // Validación de tamaño
+  let totalSize=0;
+  for(const f of filesInput.files){ totalSize+=f.size; }
+  if(totalSize>15*1024*1024){ alert('El total de adjuntos supera 15 MB.');return; }
+
   const files=[];
+  overlay.style.display='flex';                // Muestra overlay
   for(const f of filesInput.files){
-    if(f.size>5*1024*1024){ // 5 MB
-      alert(`El archivo ${f.name} supera 5 MB y no se enviará.`);
-      continue;
-    }
+    if(f.size>10*1024*1024){ alert(`Archivo ${f.name} excede 10 MB y se omite.`);continue;}
     const b64=await f.arrayBuffer()
       .then(buf=>btoa(String.fromCharCode(...new Uint8Array(buf))));
     files.push({name:f.name,mimeType:f.type,base64:b64});
   }
 
   const payload={
-    fecha:fdata.get('fecha'),
-    nombre:fdata.get('nombre')||'Anónimo',
-    cargo:fdata.get('cargo'),
-    descripcion:fdata.get('descripcion'),
+    fecha:d.get('fecha'),
+    nombre:d.get('nombre')||'',
+    cargo:d.get('cargo'),
+    descripcion:d.get('descripcion'),
     anonimo:document.getElementById('anon').checked,
     files
   };
 
   await fetch(scriptURL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});
+  overlay.style.display='none';                // Oculta overlay
   alert('✅ ¡Reporte enviado!');
-  e.target.reset();
-  document.getElementById('nombreInput').readOnly=false;
+  e.target.reset(); document.getElementById('nombreInput').disabled=false;
 });
 </script>
 </body>
