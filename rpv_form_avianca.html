@@ -1,23 +1,41 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>RPV – Avianca Cargo</title>
-<style>
- body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#000;padding:20px;max-width:600px;margin:auto}
- h1{text-align:center;color:#d52b1e}
- .logo{display:block;margin:0 auto 20px;max-width:200px}
- .form-group{margin-bottom:15px} label{font-weight:bold;display:block;margin-bottom:5px}
- input[type="text"],input[type="date"],textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:5px;box-sizing:border-box}
- textarea{resize:vertical} input[type="file"]{border:none}
- button{width:100%;background:#d52b1e;color:#fff;border:none;border-radius:5px;padding:12px;font-size:16px;cursor:pointer}
- button:hover{background:#b9151b}
- .checkbox-label,.accept-label{display:flex;align-items:center;font-weight:normal}
- .checkbox-label input,.accept-label input{margin-right:8px}
- #progressContainer{display:none;margin-top:10px}
- #progressBar{height:14px;background:#d52b1e;width:0%;border-radius:3px}
- #progressWrapper{width:100%;background:#eee;border-radius:3px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RPV – Avianca Cargo</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; background: #fff; color: #000; padding: 20px; max-width: 600px; margin: auto; }
+    h1 { text-align: center; color: #d52b1e; }
+    .logo { display: block; margin: 0 auto 20px; max-width: 200px; }
+    .form-group { margin-bottom: 15px; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; }
+    input[type="text"], input[type="date"], textarea {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;
+    }
+    textarea { resize: vertical; }
+    input[type="file"] { border: none; }
+    button {
+      width: 100%; background: #d52b1e; color: #fff; border: none; border-radius: 5px;
+      padding: 12px; font-size: 16px; cursor: pointer;
+    }
+    button:hover { background: #b9151b; }
+    .checkbox-label, .accept-label {
+      display: flex; align-items: center; font-weight: normal;
+    }
+    .checkbox-label input, .accept-label input {
+      margin-right: 8px;
+    }
+    #progressContainer {
+      display: none; margin-top: 10px;
+    }
+    #progressBar {
+      height: 14px; background: #d52b1e; width: 0%; border-radius: 3px;
+    }
+    #progressWrapper {
+      width: 100%; background: #eee; border-radius: 3px;
+    }
+  </style>
 </head>
 <body>
 
@@ -25,30 +43,42 @@
 <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
 
 <form id="rpvForm">
-  <div class="form-group"><label>Fecha del incidente
-    <input type="date" name="fecha" required></label></div>
-
-  <div class="form-group"><label>Nombre</label>
-    <label class="checkbox-label"><input type="checkbox" id="anon"> Confidencial</label>
-    <input id="nombreInput" name="nombre" type="text" placeholder="Ej: Juan Pérez"></div>
-
-  <div class="form-group"><label>Cargo
-    <input name="cargo" type="text" placeholder="Ej: Coordinador de carga"></label></div>
-
-  <div class="form-group"><label>Descripción del peligro
-    <textarea name="descripcion" rows="4" placeholder="Ej: Falla en procedimiento de estiba…" required></textarea></label></div>
-
-  <div class="form-group"><label>Evidencia (PDF/imagen/video, máx 20 MB c/u)
-    <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*"></label></div>
+  <div class="form-group">
+    <label>Fecha del incidente</label>
+    <input type="date" name="fecha" required>
+  </div>
 
   <div class="form-group">
-    <label class="accept-label"><input type="checkbox" id="acepto" required>
-      He leído y acepto el uso y tratamiento de mis datos personales.</label>
+    <label>Nombre</label>
+    <label class="checkbox-label">
+      <input type="checkbox" id="anon"> Confidencial
+    </label>
+    <input id="nombreInput" name="nombre" type="text" placeholder="Ej: Juan Pérez">
+  </div>
+
+  <div class="form-group">
+    <label>Cargo</label>
+    <input name="cargo" type="text" placeholder="Ej: Coordinador de carga">
+  </div>
+
+  <div class="form-group">
+    <label>Descripción del peligro</label>
+    <textarea name="descripcion" rows="4" placeholder="Ej: Falla en procedimiento de estiba…" required></textarea>
+  </div>
+
+  <div class="form-group">
+    <label>Evidencia (PDF/imagen/video, máx 20 MB c/u)</label>
+    <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*">
+  </div>
+
+  <div class="form-group">
+    <label class="accept-label">
+      <input type="checkbox" id="acepto" required> He leído y acepto el uso y tratamiento de mis datos personales.
+    </label>
   </div>
 
   <button type="submit">Enviar reporte</button>
 
-  <!-- Barra de progreso -->
   <div id="progressContainer">
     <div id="progressWrapper"><div id="progressBar"></div></div>
     <small id="progressText">0%</small>
@@ -56,53 +86,72 @@
 </form>
 
 <script>
-const scriptURL='https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
+const scriptURL = 'https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
 
-const form=document.getElementById('rpvForm');
-const anon=document.getElementById('anon');
-const nombreInput=document.getElementById('nombreInput');
-const progressContainer=document.getElementById('progressContainer');
-const progressBar=document.getElementById('progressBar');
-const progressText=document.getElementById('progressText');
+const form = document.getElementById('rpvForm');
+const anon = document.getElementById('anon');
+const nombreInput = document.getElementById('nombreInput');
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
 
-anon.addEventListener('change',e=>{
-  if(e.target.checked){
-    nombreInput.value=''; nombreInput.disabled=true; nombreInput.style.background='#f2f2f2';
-  }else{
-    nombreInput.disabled=false; nombreInput.style.background='#ffffff';
+anon.addEventListener('change', e => {
+  if (e.target.checked) {
+    nombreInput.value = '';
+    nombreInput.disabled = true;
+    nombreInput.placeholder = '';
+    nombreInput.style.background = '#f2f2f2';
+  } else {
+    nombreInput.disabled = false;
+    nombreInput.placeholder = 'Ej: Juan Pérez';
+    nombreInput.style.background = '#ffffff';
   }
 });
 
-form.addEventListener('submit',e=>{
+form.addEventListener('submit', e => {
   e.preventDefault();
-  if(!document.getElementById('acepto').checked){alert('Debe aceptar el tratamiento de datos.');return;}
+  if (!document.getElementById('acepto').checked) {
+    alert('Debe aceptar el tratamiento de datos.');
+    return;
+  }
 
-  const fd=new FormData(form);
-  fd.append('anonimo',anon.checked);
+  const fd = new FormData(form);
+  fd.append('anonimo', anon.checked);
 
-  // Mostrar progreso
-  progressContainer.style.display='block';
-  progressBar.style.width='0%'; progressText.textContent='0%';
+  progressContainer.style.display = 'block';
+  progressBar.style.width = '0%';
+  progressText.textContent = '0%';
 
-  const xhr=new XMLHttpRequest();
-  xhr.open('POST',scriptURL,true);
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', scriptURL, true);
 
-  xhr.upload.onprogress=evt=>{
-    if(evt.lengthComputable){
-      const percent=Math.round((evt.loaded/evt.total)*100);
-      progressBar.style.width=percent+'%';
-      progressText.textContent=percent+'%';
+  xhr.upload.onprogress = evt => {
+    if (evt.lengthComputable) {
+      const percent = Math.round((evt.loaded / evt.total) * 100);
+      progressBar.style.width = percent + '%';
+      progressText.textContent = percent + '%';
     }
   };
 
-  xhr.onload=()=>{
-    progressBar.style.width='100%'; progressText.textContent='100%';
-    alert('✅ ¡Reporte enviado!');
-    form.reset(); nombreInput.disabled=false; nombreInput.style.background='#ffffff';
-    setTimeout(()=>progressContainer.style.display='none',800);
+  xhr.onload = () => {
+    if (xhr.status === 200 || xhr.status === 0) {
+      progressBar.style.width = '100%';
+      progressText.textContent = '100%';
+      alert('✅ ¡Reporte enviado!');
+      form.reset();
+      nombreInput.disabled = false;
+      nombreInput.placeholder = 'Ej: Juan Pérez';
+      nombreInput.style.background = '#ffffff';
+      setTimeout(() => progressContainer.style.display = 'none', 800);
+    } else {
+      alert('❌ Error al enviar el reporte.');
+    }
   };
 
-  xhr.onerror=()=>{alert('❌ Error al subir.'); progressContainer.style.display='none';};
+  xhr.onerror = () => {
+    alert('❌ Error al subir.');
+    progressContainer.style.display = 'none';
+  };
 
   xhr.send(fd);
 });
