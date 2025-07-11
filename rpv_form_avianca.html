@@ -5,115 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RPV - Avianca Cargo</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #ffffff;
-      padding: 20px;
-      color: #000000;
-      max-width: 600px;
-      margin: auto;
-    }
-    h1 { color:#d71920; text-align:center; }
-    .logo { display:block; margin:0 auto 20px; max-width:200px; }
-    .form-group { margin-bottom:15px; }
-    label { font-weight:bold; display:block; margin-bottom:5px; }
-    input[type="text"], input[type="date"], textarea {
-      width:100%; padding:10px; border-radius:5px; border:1px solid #ccc; box-sizing:border-box;
-    }
-    textarea { resize:vertical; }
-    input[type="file"]{ border:none; }
-    button {
-      background:#d71920; color:#fff; padding:12px; width:100%;
-      border:none; border-radius:5px; font-size:16px; cursor:pointer;
-    }
-    button:hover{ background:#b9151b; }
-    .checkbox-label{ font-weight:normal; display:flex; align-items:center; }
-    .checkbox-label input{ margin-right:8px; }
+    body{font-family:Arial, sans-serif;background:#fff;padding:20px;color:#000;max-width:600px;margin:auto;}
+    h1{color:#d71920;text-align:center;}
+    .logo{display:block;margin:0 auto 20px;max-width:200px;}
+    .form-group{margin-bottom:15px;}
+    label{font-weight:bold;display:block;margin-bottom:5px;}
+    input[type="text"],input[type="date"],textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:5px;box-sizing:border-box;}
+    textarea{resize:vertical;} input[type="file"]{border:none;}
+    button{background:#d71920;color:#fff;padding:12px;width:100%;border:none;border-radius:5px;font-size:16px;cursor:pointer;}
+    button:hover{background:#b9151b;}
+    .checkbox-label{font-weight:normal;display:flex;align-items:center;} .checkbox-label input{margin-right:8px;}
   </style>
 </head>
 <body>
-  <!-- Logo en Base64 -->
-  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAAfCAYAAACuU8btAAAACXBIWXMAAAsSAAALEgHS3X78AAABlklEQVRIS+2WwU3CMBBGZ+W8U4FCUAEKIAUoQAVKACqgA6gAtSAFSgA6hAlCBcOqXM6O2cSfMduOeGZ1L6pv7YZNAe9hAcMcAw2gzeyUk3AG3AicRUwM3JTAxCAl+Whhe4TRhZYiQ8AewrGzCpURjDvNC8iqSo1uwAnCwSJKDp4BvwWPN7EWzWNe8UqUGSvQ0MiJ4QhN5kF97ihYOY1WZlz3CbpZgDkZGMl6k+hgAHWQxEccZzR4YAzkeWi5Xdf6ccDNxtRJEWZ6tQA9eDmfZ28B0kWmg0kt62ZYU0CXAVoNUcPJBbqT9hM7HmjVu5kbzeXlOkGBgjI5qRYsOpYvmuvqGiRHrA/fU9HuT3l3F3nzReKP2D9gux+Rg7Q9ebv5V1p1T8sRHYHJkMG0s4YBaT5n+QzyYymQGiZp6AAAAAElFTkSuQmCC"
-       alt="Avianca Cargo" class="logo" />
+  <!-- Logo incrustado en Base64 -->
+  <img class="logo" alt="Avianca Cargo"
+       src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAAfCAYAAACuU8btAAAACXBIWXMAAAsSAAALEgHS3X78AAABlklEQVRIS+2WwU3CMBBGZ+W8U4FCUAEKIAUoQAVKACqgA6gAtSAFSgA6hAlCBcOqXM6O2cSfMduOeGZ1L6pv7YZNAe9hAcMcAw2gzeyUk3AG3AicRUwM3JTAxCAl+Whhe4TRhZYiQ8AewrGzCpURjDvNC8iqSo1uwAnCwSJKDp4BvwWPN7EWzWNe8UqUGSvQ0MiJ4QhN5kF97ihYOY1WZlz3CbpZgDkZGMl6k+hgAHWQxEccZzR4YAzkeWi5Xdf6ccDNxtRJEWZ6tQA9eDmfZ28B0kWmg0kt62ZYU0CXAVoNUcPJBbqT9hM7HmjVu5kbzeXlOkGBgjI5qRYsOpYvmuvqGiRHrA/fU9HuT3l3F3nzReKP2D9gux+Rg7Q9ebv5V1p1T8sRHYHJkMG0s4YBaT5n+QzyYymQGiZp6AAAAAElFTkSuQmCC"/>
 
   <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
 
   <form id="rpvForm">
     <div class="form-group">
       <label for="fecha">Fecha del incidente</label>
-      <input type="date" name="fecha" id="fecha" required />
+      <input type="date" id="fecha" name="fecha" required>
     </div>
 
     <div class="form-group">
       <label for="nombre">Nombre</label>
       <label class="checkbox-label">
-        <input type="checkbox" id="anon" /> Marcar como confidencial
+        <input type="checkbox" id="anon"> Marcar como confidencial
       </label>
-      <input type="text" name="nombre" id="nombreInput" placeholder="Tu nombre" />
+      <input type="text" id="nombreInput" name="nombre" placeholder="Tu nombre">
     </div>
 
     <div class="form-group">
       <label for="cargo">Cargo</label>
-      <input type="text" name="cargo" id="cargo" placeholder="Ej: Coordinador de carga" />
+      <input type="text" id="cargo" name="cargo" placeholder="Ej: Coordinador de carga">
     </div>
 
     <div class="form-group">
       <label for="descripcion">Descripción del peligro</label>
-      <textarea name="descripcion" id="descripcion" rows="4" placeholder="Describe lo sucedido..." required></textarea>
+      <textarea id="descripcion" name="descripcion" rows="4" placeholder="Describe lo sucedido..." required></textarea>
     </div>
 
     <div class="form-group">
       <label for="files">Evidencia (opcional)</label>
-      <input type="file" name="files" id="files" multiple accept="image/*,application/pdf,video/*" />
+      <input type="file" id="files" name="files" multiple
+             accept="image/*,application/pdf,video/*">
     </div>
 
     <button type="submit">Enviar reporte</button>
   </form>
 
   <script>
-    // Desactiva el nombre si marcan confidencial
+    // Desactiva nombre si marcan confidencial
     document.getElementById('anon').addEventListener('change', e=>{
       const n=document.getElementById('nombreInput');
-      if(e.target.checked){ n.value=''; n.disabled=true; }
-      else{ n.disabled=false; }
+      if(e.target.checked){n.value='';n.disabled=true;}else{n.disabled=false;}
     });
 
-    // URL de tu implementación Web App (termina en /exec)
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwc1ez9QJ4An0nevBj1VdiZJp4zmZXUC9hTvkPJkPN7v_6ccFPEvjaDixPE3ItqgO0/exec";
+    // ← Sustituye por TU URL /exec:
+    const scriptURL='https://script.google.com/macros/s/AKfycbwc1ez9QJ4An0nevBj1VdiZJp4zmZXUC9hTvkPJkPN7v_6ccFPEvjaDixPE3ItqgO0/exec';
 
-    document.getElementById('rpvForm').addEventListener('submit', async e=>{
+    document.getElementById('rpvForm').addEventListener('submit',async e=>{
       e.preventDefault();
-      const form=e.target;
-      const data=new FormData(form);
+      const d=new FormData(e.target);
 
-      // Convierte archivos a Base64 y adjunta como texto largo
+      // Procesar archivos a Base64 y empaquetar
       const files=[];
-      for(const f of data.getAll('files')){
-        if(f.size>0){
+      for(const f of d.getAll('files')){
+        if(f.size){
           const b64=await f.arrayBuffer()
             .then(buf=>btoa(String.fromCharCode(...new Uint8Array(buf))));
           files.push(JSON.stringify({name:f.name,mimeType:f.type,base64:b64}));
         }
       }
 
-      // Construye parámetro URL‑encoded
       const payload=new URLSearchParams({
-        fecha:data.get('fecha'),
-        nombre:data.get('nombre'),
-        cargo:data.get('cargo'),
-        descripcion:data.get('descripcion'),
+        fecha:d.get('fecha'),
+        nombre:d.get('nombre'),
+        cargo:d.get('cargo'),
+        descripcion:d.get('descripcion'),
         anonimo:document.getElementById('anon').checked,
-        files:files.join(';')             // se envía como string
+        files:files.join(';')
       });
 
       try{
-        await fetch(scriptURL,{
-          method:'POST',
-          mode:'no-cors',
-          body:payload                 // sin headers
-        });
+        await fetch(scriptURL,{method:'POST',mode:'no-cors',body:payload});
         alert('✅ ¡Reporte enviado con éxito!');
-        form.reset();
+        e.target.reset();
         document.getElementById('nombreInput').disabled=false;
       }catch(err){
         alert('❌ Error al enviar el reporte.');
