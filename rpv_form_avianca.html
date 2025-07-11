@@ -14,11 +14,12 @@
  button:hover{background:#b9151b}
  .checkbox-label,.accept-label{display:flex;align-items:center;font-weight:normal}
  .checkbox-label input,.accept-label input{margin-right:8px}
- #overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;z-index:99;display:none}
+ #progressContainer{display:none;margin-top:10px}
+ #progressBar{height:14px;background:#d52b1e;width:0%;border-radius:3px}
+ #progressWrapper{width:100%;background:#eee;border-radius:3px}
 </style>
 </head>
 <body>
-<div id="overlay">⏳ Subiendo archivos, por favor espera…</div>
 
 <img class="logo" src="https://raw.githubusercontent.com/JuanCamiloTibaduiza/avianca-rpv-demo/main/logo_avianca_cargo.png" alt="Avianca Cargo">
 <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
@@ -37,7 +38,7 @@
   <div class="form-group"><label>Descripción del peligro
     <textarea name="descripcion" rows="4" placeholder="Ej: Falla en procedimiento de estiba…" required></textarea></label></div>
 
-  <div class="form-group"><label>Evidencia (PDF/imagen/video, máx 10 MB c/u)
+  <div class="form-group"><label>Evidencia (PDF/imagen/video, máx 20 MB c/u)
     <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*"></label></div>
 
   <div class="form-group">
@@ -46,62 +47,64 @@
   </div>
 
   <button type="submit">Enviar reporte</button>
+
+  <!-- Barra de progreso -->
+  <div id="progressContainer">
+    <div id="progressWrapper"><div id="progressBar"></div></div>
+    <small id="progressText">0%</small>
+  </div>
 </form>
 
 <script>
 const scriptURL='https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
-const overlay=document.getElementById('overlay');
-let delayHandle=null;            // para el aviso de 2 s
 
-// Confidencial
-document.getElementById('anon').addEventListener('change',e=>{
-  const n=document.getElementById('nombreInput');
+const form=document.getElementById('rpvForm');
+const anon=document.getElementById('anon');
+const nombreInput=document.getElementById('nombreInput');
+const progressContainer=document.getElementById('progressContainer');
+const progressBar=document.getElementById('progressBar');
+const progressText=document.getElementById('progressText');
+
+anon.addEventListener('change',e=>{
   if(e.target.checked){
-    n.value=''; n.disabled=true; n.style.background='#f2f2f2';
+    nombreInput.value=''; nombreInput.disabled=true; nombreInput.style.background='#f2f2f2';
   }else{
-    n.disabled=false; n.style.background='#ffffff';
+    nombreInput.disabled=false; nombreInput.style.background='#ffffff';
   }
 });
 
-document.getElementById('rpvForm').addEventListener('submit',async e=>{
+form.addEventListener('submit',e=>{
   e.preventDefault();
-  if(!document.getElementById('acepto').checked){
-    alert('Debe aceptar el tratamiento de datos.');return;
-  }
+  if(!document.getElementById('acepto').checked){alert('Debe aceptar el tratamiento de datos.');return;}
 
-  const d=new FormData(e.target);
-  const filesInput=document.getElementById('files');
+  const fd=new FormData(form);
+  fd.append('anonimo',anon.checked);
 
-  // Límite total 15 MB
-  let total=0; for(const f of filesInput.files){ total+=f.size;}
-  if(total>15*1024*1024){ alert('El total de adjuntos supera 15 MB.'); return;}
+  // Mostrar progreso
+  progressContainer.style.display='block';
+  progressBar.style.width='0%'; progressText.textContent='0%';
 
-  // Mostrar overlay SOLO si tarda >2 s
-  delayHandle=setTimeout(()=>overlay.style.display='flex',2000);
+  const xhr=new XMLHttpRequest();
+  xhr.open('POST',scriptURL,true);
 
-  const files=[];
-  for(const f of filesInput.files){
-    if(f.size>10*1024*1024){ alert(`Archivo ${f.name} excede 10 MB y se omite.`);continue;}
-    const b64=await f.arrayBuffer()
-      .then(buf=>btoa(String.fromCharCode(...new Uint8Array(buf))));
-    files.push({name:f.name,mimeType:f.type,base64:b64});
-  }
-
-  const payload={
-    fecha:d.get('fecha'),
-    nombre:d.get('nombre')||'',
-    cargo:d.get('cargo'),
-    descripcion:d.get('descripcion'),
-    anonimo:document.getElementById('anon').checked,
-    files
+  xhr.upload.onprogress=evt=>{
+    if(evt.lengthComputable){
+      const percent=Math.round((evt.loaded/evt.total)*100);
+      progressBar.style.width=percent+'%';
+      progressText.textContent=percent+'%';
+    }
   };
 
-  await fetch(scriptURL,{method:'POST',mode:'no-cors',body:JSON.stringify(payload)});
+  xhr.onload=()=>{
+    progressBar.style.width='100%'; progressText.textContent='100%';
+    alert('✅ ¡Reporte enviado!');
+    form.reset(); nombreInput.disabled=false; nombreInput.style.background='#ffffff';
+    setTimeout(()=>progressContainer.style.display='none',800);
+  };
 
-  clearTimeout(delayHandle); overlay.style.display='none';
-  alert('✅ ¡Reporte enviado!');
-  e.target.reset(); document.getElementById('nombreInput').disabled=false;
-  document.getElementById('nombreInput').style.background='#ffffff';
+  xhr.onerror=()=>{alert('❌ Error al subir.'); progressContainer.style.display='none';};
+
+  xhr.send(fd);
 });
 </script>
 </body>
