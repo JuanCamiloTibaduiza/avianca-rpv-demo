@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>RPV – Avianca Cargo</title>
 
-  <!-- ✅ ICONO EN PESTAÑA DEL NAVEGADOR -->
+  <!-- Icono en pestaña -->
   <link rel="icon" type="image/png" href="https://juancamilotibaduiza.github.io/avianca-rpv-demo/logo_avianca_cargo.png">
 
   <style>
@@ -106,7 +106,7 @@
       margin-top: 5px;
     }
 
-    /* ✅ ANIMACIÓN DE BIENVENIDA */
+    /* Bienvenida */
     #welcomeOverlay {
       position: fixed;
       inset: 0;
@@ -123,6 +123,7 @@
       font-size: 2em;
       font-weight: bold;
       margin-left: 5%;
+      font-family: 'Segoe UI', sans-serif;
       z-index: 1;
     }
     #plane {
@@ -130,7 +131,7 @@
       left: -300px;
       width: 200px;
       z-index: 2;
-      animation: fly 5s linear forwards;
+      animation: fly 3s linear forwards; /* velocidad aumentada */
     }
     @keyframes fly {
       to { left: 100%; }
@@ -139,13 +140,13 @@
 </head>
 <body>
 
-<!-- ✅ BIENVENIDA -->
+<!-- Animación de bienvenida -->
 <div id="welcomeOverlay">
   <div id="welcomeText">Bienvenido al sistema de reporte RPV de Avianca Cargo</div>
-  <img id="plane" src="https://juancamilotibaduiza.github.io/avianca-rpv-demo/plane_avianca.png" alt="Avión Avianca">
+  <img id="plane" src="https://juancamilotibaduiza.github.io/avianca-rpv-demo/logo_avianca_cargo.png" alt="Avión Avianca">
 </div>
 
-<!-- ✅ OVERLAY DE SUBIDA -->
+<!-- Overlay de carga -->
 <div id="overlay">
   ⏳ Subiendo archivos, por favor espera…
   <div id="progressContainer" style="display:none;">
@@ -190,12 +191,12 @@ const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressPercent = document.getElementById('progressPercent');
 
-// Ocultar animación después de 5 segundos
+// Ocultar animación de bienvenida tras 5 segundos
 setTimeout(() => {
   document.getElementById('welcomeOverlay').style.display = 'none';
 }, 5000);
 
-// Confidencial
+// Checkbox de confidencialidad
 document.getElementById('anon').addEventListener('change', e => {
   const n = document.getElementById('nombreInput');
   if (e.target.checked) {
