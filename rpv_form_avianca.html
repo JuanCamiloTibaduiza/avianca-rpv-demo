@@ -93,6 +93,11 @@
       overflow: hidden;
       height: 14px;
     }
+    #progressPercent {
+      text-align: right;
+      font-size: 13px;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -142,6 +147,7 @@
     <div id="progressWrapper">
       <div id="progressBar"></div>
     </div>
+    <div id="progressPercent">0%</div>
   </div>
 
   <button type="submit">Enviar reporte</button>
@@ -150,7 +156,9 @@
 <script>
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
 const overlay = document.getElementById('overlay');
-let delayHandle = null;
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
+const progressPercent = document.getElementById('progressPercent');
 
 document.getElementById('anon').addEventListener('change', e => {
   const n = document.getElementById('nombreInput');
@@ -177,10 +185,6 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
 
   const d = new FormData(e.target);
   const filesInput = document.getElementById('files');
-  const progressBar = document.getElementById('progressBar');
-  const progressContainer = document.getElementById('progressContainer');
-  progressContainer.style.display = 'none';
-  progressBar.style.width = '0%';
 
   let total = 0;
   for (const f of filesInput.files) total += f.size;
@@ -189,10 +193,12 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
     return;
   }
 
-  delayHandle = setTimeout(() => overlay.style.display = 'flex', 2000);
+  overlay.style.display = 'flex';
+  progressContainer.style.display = 'block';
+  progressBar.style.width = '0%';
+  progressPercent.textContent = '0%';
 
   const files = [];
-  let index = 0;
   for (const f of filesInput.files) {
     if (f.size > 10 * 1024 * 1024) {
       alert(`Archivo ${f.name} excede 10 MB y se omite.`);
@@ -206,11 +212,6 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
     });
 
     files.push({ name: f.name, mimeType: f.type, base64 });
-
-    index++;
-    const percent = Math.round((index / filesInput.files.length) * 100);
-    progressContainer.style.display = 'block';
-    progressBar.style.width = percent + '%';
   }
 
   const payload = {
@@ -222,21 +223,40 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
     files
   };
 
-  await fetch(scriptURL, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: JSON.stringify(payload)
-  });
+  // Envío con barra de progreso real
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', scriptURL, true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.upload.onprogress = evt => {
+    if (evt.lengthComputable) {
+      const percent = Math.round((evt.loaded / evt.total) * 100);
+      progressBar.style.width = percent + '%';
+      progressPercent.textContent = percent + '%';
+    }
+  };
 
-  clearTimeout(delayHandle);
-  overlay.style.display = 'none';
-  alert('✅ ¡Reporte enviado!');
-  e.target.reset();
-  document.getElementById('nombreInput').disabled = false;
-  document.getElementById('nombreInput').placeholder = 'Ej: Juan Pérez';
-  document.getElementById('nombreInput').style.background = '#ffffff';
-  progressBar.style.width = '0%';
-  progressContainer.style.display = 'none';
+  xhr.onload = () => {
+    overlay.style.display = 'none';
+    progressBar.style.width = '100%';
+    progressPercent.textContent = '100%';
+    alert('✅ ¡Reporte enviado!');
+    e.target.reset();
+    document.getElementById('nombreInput').disabled = false;
+    document.getElementById('nombreInput').placeholder = 'Ej: Juan Pérez';
+    document.getElementById('nombreInput').style.background = '#ffffff';
+    setTimeout(() => {
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+      progressPercent.textContent = '0%';
+    }, 1000);
+  };
+
+  xhr.onerror = () => {
+    overlay.style.display = 'none';
+    alert('❌ Error al enviar el reporte.');
+  };
+
+  xhr.send(JSON.stringify(payload));
 });
 </script>
 
