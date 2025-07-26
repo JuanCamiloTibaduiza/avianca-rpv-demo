@@ -116,7 +116,9 @@
   <div class="form-group">
     <label>Nombre</label>
     <input id="nombreInput" name="nombre" type="text" placeholder="Ej: Juan Pérez">
-    <label class="checkbox-label"><input type="checkbox" id="anon"> Confidencial</label>
+    <label class="checkbox-label">
+      <input type="checkbox" id="anon"> Confidencial
+    </label>
   </div>
 
   <div class="form-group">
@@ -160,6 +162,7 @@ const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressPercent = document.getElementById('progressPercent');
 
+// Modo anónimo
 document.getElementById('anon').addEventListener('change', e => {
   const n = document.getElementById('nombreInput');
   if (e.target.checked) {
@@ -177,8 +180,7 @@ document.getElementById('anon').addEventListener('change', e => {
 document.getElementById('rpvForm').addEventListener('submit', async e => {
   e.preventDefault();
 
-  const accept = document.getElementById('acepto');
-  if (!accept.checked) {
+  if (!document.getElementById('acepto').checked) {
     alert('Debe aceptar el tratamiento de datos.');
     return;
   }
@@ -199,6 +201,7 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
   progressPercent.textContent = '0%';
 
   const files = [];
+  let progress = 0;
   for (const f of filesInput.files) {
     if (f.size > 10 * 1024 * 1024) {
       alert(`Archivo ${f.name} excede 10 MB y se omite.`);
@@ -207,56 +210,52 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
 
     const reader = new FileReader();
     const base64 = await new Promise(resolve => {
-      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onload = () => {
+        progress += f.size;
+        const percent = Math.min(100, Math.round((progress / total) * 100));
+        progressBar.style.width = percent + '%';
+        progressPercent.textContent = percent + '%';
+        resolve(reader.result.split(',')[1]);
+      };
       reader.readAsDataURL(f);
     });
 
     files.push({ name: f.name, mimeType: f.type, base64 });
   }
 
+  const isAnon = document.getElementById('anon').checked;
+  const nombreFinal = isAnon ? 'Anónimo' : (d.get('nombre') || '');
+
   const payload = {
     fecha: d.get('fecha'),
-    nombre: d.get('nombre') || '',
+    nombre: nombreFinal,
     cargo: d.get('cargo'),
     descripcion: d.get('descripcion'),
-    anonimo: document.getElementById('anon').checked,
+    anonimo: isAnon,
     files
   };
 
-  // Envío con barra de progreso real
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', scriptURL, true);
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.upload.onprogress = evt => {
-    if (evt.lengthComputable) {
-      const percent = Math.round((evt.loaded / evt.total) * 100);
-      progressBar.style.width = percent + '%';
-      progressPercent.textContent = percent + '%';
-    }
-  };
+  await fetch(scriptURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify(payload)
+  });
 
-  xhr.onload = () => {
-    overlay.style.display = 'none';
-    progressBar.style.width = '100%';
-    progressPercent.textContent = '100%';
-    alert('✅ ¡Reporte enviado!');
-    e.target.reset();
-    document.getElementById('nombreInput').disabled = false;
-    document.getElementById('nombreInput').placeholder = 'Ej: Juan Pérez';
-    document.getElementById('nombreInput').style.background = '#ffffff';
-    setTimeout(() => {
-      progressContainer.style.display = 'none';
-      progressBar.style.width = '0%';
-      progressPercent.textContent = '0%';
-    }, 1000);
-  };
+  overlay.style.display = 'none';
+  progressBar.style.width = '100%';
+  progressPercent.textContent = '100%';
 
-  xhr.onerror = () => {
-    overlay.style.display = 'none';
-    alert('❌ Error al enviar el reporte.');
-  };
+  alert('✅ ¡Reporte enviado!');
+  e.target.reset();
+  document.getElementById('nombreInput').disabled = false;
+  document.getElementById('nombreInput').placeholder = 'Ej: Juan Pérez';
+  document.getElementById('nombreInput').style.background = '#ffffff';
 
-  xhr.send(JSON.stringify(payload));
+  setTimeout(() => {
+    progressContainer.style.display = 'none';
+    progressBar.style.width = '0%';
+    progressPercent.textContent = '0%';
+  }, 1000);
 });
 </script>
 
