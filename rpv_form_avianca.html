@@ -4,6 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>RPV – Avianca Cargo</title>
+
+  <!-- ✅ ICONO EN PESTAÑA DEL NAVEGADOR -->
+  <link rel="icon" type="image/png" href="https://juancamilotibaduiza.github.io/avianca-rpv-demo/logo_avianca_cargo.png">
+
   <style>
     body {
       font-family: Arial, Helvetica, sans-serif;
@@ -65,7 +69,6 @@
       margin-right: 8px;
     }
 
-    /* Overlay de carga */
     #overlay {
       position: fixed;
       inset: 0;
@@ -79,6 +82,7 @@
       z-index: 99;
       display: none;
     }
+
     #progressContainer {
       width: 80%;
       margin-top: 20px;
@@ -102,11 +106,11 @@
       margin-top: 5px;
     }
 
-    /* Overlay de bienvenida */
+    /* ✅ ANIMACIÓN DE BIENVENIDA */
     #welcomeOverlay {
       position: fixed;
       inset: 0;
-      background: #d52b1e;
+      background: linear-gradient(to right, #d52b1e, #ffffff);
       display: flex;
       justify-content: flex-start;
       align-items: center;
@@ -114,40 +118,34 @@
       z-index: 999;
       flex-direction: row;
     }
-    .plane-container {
-      position: relative;
-      animation: fly 3.5s ease-in-out forwards;
-      display: flex;
-      align-items: center;
-      gap: 20px;
+    #welcomeText {
+      color: white;
+      font-size: 2em;
+      font-weight: bold;
+      margin-left: 5%;
+      z-index: 1;
     }
     #plane {
-      width: 250px;
-    }
-    #welcomeMsg {
-      font-size: 22px;
-      color: #fff;
-      white-space: nowrap;
-      font-weight: bold;
+      position: absolute;
+      left: -300px;
+      width: 200px;
+      z-index: 2;
+      animation: fly 5s linear forwards;
     }
     @keyframes fly {
-      0% { transform: translateX(-300px); opacity: 0; }
-      10% { opacity: 1; }
-      100% { transform: translateX(110vw); opacity: 0; }
+      to { left: 100%; }
     }
   </style>
 </head>
 <body>
 
-<!-- Bienvenida -->
+<!-- ✅ BIENVENIDA -->
 <div id="welcomeOverlay">
-  <div class="plane-container">
-    <img src="https://raw.githubusercontent.com/JuanCamiloTibaduiza/avianca-rpv-demo/main/plane_avianca.png" id="plane" alt="Avión Avianca">
-    <div id="welcomeMsg">Bienvenido al sistema de Reporte de Peligros Voluntarios</div>
-  </div>
+  <div id="welcomeText">Bienvenido al sistema de reporte RPV de Avianca Cargo</div>
+  <img id="plane" src="https://juancamilotibaduiza.github.io/avianca-rpv-demo/logo_avianca_cargo.png" alt="Avión Avianca">
 </div>
 
-<!-- Carga -->
+<!-- ✅ OVERLAY DE SUBIDA -->
 <div id="overlay">
   ⏳ Subiendo archivos, por favor espera…
   <div id="progressContainer" style="display:none;">
@@ -156,11 +154,9 @@
   </div>
 </div>
 
-<!-- Logo -->
 <img class="logo" src="https://raw.githubusercontent.com/JuanCamiloTibaduiza/avianca-rpv-demo/main/logo_avianca_cargo.png" alt="Avianca Cargo">
 <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
 
-<!-- Formulario -->
 <form id="rpvForm">
   <div class="form-group"><label>Fecha del incidente
     <input type="date" name="fecha" required></label></div>
@@ -194,12 +190,10 @@ const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressPercent = document.getElementById('progressPercent');
 
-// Bienvenida
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    document.getElementById('welcomeOverlay').style.display = 'none';
-  }, 4000);
-});
+// Ocultar animación después de 5 segundos
+setTimeout(() => {
+  document.getElementById('welcomeOverlay').style.display = 'none';
+}, 5000);
 
 // Confidencial
 document.getElementById('anon').addEventListener('change', e => {
@@ -272,7 +266,6 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
     files
   };
 
-  // Avance al 90%
   progressBar.style.width = '90%';
   progressPercent.textContent = '90%';
 
@@ -282,7 +275,6 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
     body: JSON.stringify(payload)
   });
 
-  // 100%
   progressBar.style.width = '100%';
   progressPercent.textContent = '100%';
 
