@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>RPV – Avianca Cargo</title>
   <style>
     body {
@@ -67,7 +67,7 @@
     #overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0,0,0,.5);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -76,156 +76,169 @@
       z-index: 99;
       display: none;
     }
-    #progressBarContainer {
-      display: none;
-      width: 100%;
-      background-color: #f3f3f3;
-      border-radius: 4px;
-      overflow: hidden;
+    #progressContainer {
       margin-top: 10px;
+      display: none;
     }
     #progressBar {
+      height: 14px;
+      background-color: #d52b1e;
+      border-radius: 6px;
+      transition: width 0.4s ease;
       width: 0%;
-      height: 16px;
-      background-color: #4caf50;
-      transition: width 0.2s ease;
+    }
+    #progressWrapper {
+      background: #eee;
+      border-radius: 6px;
+      overflow: hidden;
+      height: 14px;
     }
   </style>
 </head>
 <body>
-  <div id="overlay">⏳ Subiendo archivos, por favor espera…</div>
-  <img class="logo" src="https://raw.githubusercontent.com/JuanCamiloTibaduiza/avianca-rpv-demo/main/logo_avianca_cargo.png" alt="Avianca Cargo">
-  <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
 
-  <form id="rpvForm">
-    <div class="form-group">
-      <label>Fecha del incidente</label>
+<div id="overlay">⏳ Subiendo archivos, por favor espera…</div>
+<img class="logo" src="https://raw.githubusercontent.com/JuanCamiloTibaduiza/avianca-rpv-demo/main/logo_avianca_cargo.png" alt="Avianca Cargo">
+<h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
+
+<form id="rpvForm">
+  <div class="form-group">
+    <label>Fecha del incidente
       <input type="date" name="fecha" required>
-    </div>
+    </label>
+  </div>
 
-    <div class="form-group">
-      <label>Nombre</label>
-      <input id="nombreInput" name="nombre" type="text" placeholder="Ej: Juan Pérez">
-      <label class="checkbox-label">
-        <input type="checkbox" id="anon"> Confidencial
-      </label>
-    </div>
+  <div class="form-group">
+    <label>Nombre</label>
+    <input id="nombreInput" name="nombre" type="text" placeholder="Ej: Juan Pérez">
+    <label class="checkbox-label"><input type="checkbox" id="anon"> Confidencial</label>
+  </div>
 
-    <div class="form-group">
-      <label>Cargo</label>
+  <div class="form-group">
+    <label>Cargo
       <input name="cargo" type="text" placeholder="Ej: Coordinador de carga">
-    </div>
+    </label>
+  </div>
 
-    <div class="form-group">
-      <label>Descripción del peligro</label>
+  <div class="form-group">
+    <label>Descripción del peligro
       <textarea name="descripcion" rows="4" placeholder="Ej: Falla en procedimiento de estiba…" required></textarea>
-    </div>
+    </label>
+  </div>
 
-    <div class="form-group">
-      <label>Evidencia (PDF/imagen/video, máx 10 MB c/u)</label>
+  <div class="form-group">
+    <label>Evidencia (PDF/imagen/video, máx 10 MB c/u)
       <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*">
-    </div>
+    </label>
+  </div>
 
-    <div id="progressBarContainer">
+  <div class="form-group accept-label">
+    <input type="checkbox" id="acepto" required>
+    He leído y acepto el uso y tratamiento de mis datos personales.
+  </div>
+
+  <div id="progressContainer">
+    <label>Progreso de carga:</label>
+    <div id="progressWrapper">
       <div id="progressBar"></div>
     </div>
+  </div>
 
-    <div class="form-group">
-      <label class="accept-label">
-        <input type="checkbox" id="acepto" required>
-        He leído y acepto el uso y tratamiento de mis datos personales.
-      </label>
-    </div>
+  <button type="submit">Enviar reporte</button>
+</form>
 
-    <button type="submit">Enviar reporte</button>
-  </form>
+<script>
+const scriptURL = 'https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
+const overlay = document.getElementById('overlay');
+let delayHandle = null;
 
-  <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
-    const overlay = document.getElementById('overlay');
-    const progressBar = document.getElementById('progressBar');
-    const progressBarContainer = document.getElementById('progressBarContainer');
+document.getElementById('anon').addEventListener('change', e => {
+  const n = document.getElementById('nombreInput');
+  if (e.target.checked) {
+    n.value = '';
+    n.disabled = true;
+    n.placeholder = '';
+    n.style.background = '#f2f2f2';
+  } else {
+    n.disabled = false;
+    n.placeholder = 'Ej: Juan Pérez';
+    n.style.background = '#ffffff';
+  }
+});
 
-    document.getElementById('anon').addEventListener('change', e => {
-      const n = document.getElementById('nombreInput');
-      if (e.target.checked) {
-        n.value = '';
-        n.placeholder = '';
-        n.disabled = true;
-        n.style.background = '#f2f2f2';
-      } else {
-        n.disabled = false;
-        n.placeholder = 'Ej: Juan Pérez';
-        n.style.background = '#ffffff';
-      }
+document.getElementById('rpvForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const accept = document.getElementById('acepto');
+  if (!accept.checked) {
+    alert('Debe aceptar el tratamiento de datos.');
+    return;
+  }
+
+  const d = new FormData(e.target);
+  const filesInput = document.getElementById('files');
+  const progressBar = document.getElementById('progressBar');
+  const progressContainer = document.getElementById('progressContainer');
+  progressContainer.style.display = 'none';
+  progressBar.style.width = '0%';
+
+  let total = 0;
+  for (const f of filesInput.files) total += f.size;
+  if (total > 15 * 1024 * 1024) {
+    alert('El total de adjuntos supera 15 MB.');
+    return;
+  }
+
+  delayHandle = setTimeout(() => overlay.style.display = 'flex', 2000);
+
+  const files = [];
+  let index = 0;
+  for (const f of filesInput.files) {
+    if (f.size > 10 * 1024 * 1024) {
+      alert(`Archivo ${f.name} excede 10 MB y se omite.`);
+      continue;
+    }
+
+    const reader = new FileReader();
+    const base64 = await new Promise(resolve => {
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.readAsDataURL(f);
     });
 
-    document.getElementById('rpvForm').addEventListener('submit', async e => {
-      e.preventDefault();
+    files.push({ name: f.name, mimeType: f.type, base64 });
 
-      if (!document.getElementById('acepto').checked) {
-        alert('Debe aceptar el tratamiento de datos.');
-        return;
-      }
+    index++;
+    const percent = Math.round((index / filesInput.files.length) * 100);
+    progressContainer.style.display = 'block';
+    progressBar.style.width = percent + '%';
+  }
 
-      const d = new FormData(e.target);
-      const filesInput = document.getElementById('files');
+  const payload = {
+    fecha: d.get('fecha'),
+    nombre: d.get('nombre') || '',
+    cargo: d.get('cargo'),
+    descripcion: d.get('descripcion'),
+    anonimo: document.getElementById('anon').checked,
+    files
+  };
 
-      let total = 0;
-      for (const f of filesInput.files) {
-        total += f.size;
-      }
-      if (total > 15 * 1024 * 1024) {
-        alert('El total de adjuntos supera 15 MB.');
-        return;
-      }
+  await fetch(scriptURL, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: JSON.stringify(payload)
+  });
 
-      overlay.style.display = 'flex';
-      progressBarContainer.style.display = 'block';
-      progressBar.style.width = '0%';
+  clearTimeout(delayHandle);
+  overlay.style.display = 'none';
+  alert('✅ ¡Reporte enviado!');
+  e.target.reset();
+  document.getElementById('nombreInput').disabled = false;
+  document.getElementById('nombreInput').placeholder = 'Ej: Juan Pérez';
+  document.getElementById('nombreInput').style.background = '#ffffff';
+  progressBar.style.width = '0%';
+  progressContainer.style.display = 'none';
+});
+</script>
 
-      const files = [];
-      for (const f of filesInput.files) {
-        if (f.size > 10 * 1024 * 1024) {
-          alert(`Archivo ${f.name} excede 10 MB y se omite.`);
-          continue;
-        }
-        const arrayBuffer = await f.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
-        files.push({ name: f.name, mimeType: f.type, base64 });
-        // Avanzar la barra
-        const percent = Math.min(100, Math.floor((files.length / filesInput.files.length) * 100));
-        progressBar.style.width = `${percent}%`;
-      }
-
-      const payload = {
-        fecha: d.get('fecha'),
-        nombre: document.getElementById('anon').checked ? 'Anónimo' : (d.get('nombre') || ''),
-        cargo: d.get('cargo'),
-        descripcion: d.get('descripcion'),
-        anonimo: document.getElementById('anon').checked,
-        files
-      };
-
-      try {
-        await fetch(scriptURL, {
-          method: 'POST',
-          mode: 'no-cors',
-          body: JSON.stringify(payload)
-        });
-        alert('✅ ¡Reporte enviado!');
-      } catch (err) {
-        alert('❌ Error al enviar.');
-        console.error(err);
-      }
-
-      overlay.style.display = 'none';
-      progressBarContainer.style.display = 'none';
-      progressBar.style.width = '0%';
-      e.target.reset();
-      document.getElementById('nombreInput').disabled = false;
-      document.getElementById('nombreInput').style.background = '#ffffff';
-    });
-  </script>
 </body>
 </html>
