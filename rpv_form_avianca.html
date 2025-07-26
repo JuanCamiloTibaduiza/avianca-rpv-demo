@@ -67,25 +67,26 @@
     #overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.5);
+      background: rgba(0,0,0,.7);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       color: #fff;
-      font-size: 20px;
+      font-size: 18px;
       z-index: 99;
       display: none;
     }
     #progressContainer {
-      margin-top: 10px;
-      display: none;
+      width: 80%;
+      margin-top: 20px;
     }
     #progressBar {
       height: 14px;
       background-color: #d52b1e;
       border-radius: 6px;
-      transition: width 0.4s ease;
       width: 0%;
+      transition: width 0.3s ease;
     }
     #progressWrapper {
       background: #eee;
@@ -96,60 +97,44 @@
     #progressPercent {
       text-align: right;
       font-size: 13px;
-      margin-top: 4px;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
 
-<div id="overlay">⏳ Subiendo archivos, por favor espera…</div>
+<div id="overlay">
+  ⏳ Subiendo archivos, por favor espera…
+  <div id="progressContainer" style="display:none;">
+    <div id="progressWrapper"><div id="progressBar"></div></div>
+    <div id="progressPercent">0%</div>
+  </div>
+</div>
+
 <img class="logo" src="https://raw.githubusercontent.com/JuanCamiloTibaduiza/avianca-rpv-demo/main/logo_avianca_cargo.png" alt="Avianca Cargo">
 <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
 
 <form id="rpvForm">
-  <div class="form-group">
-    <label>Fecha del incidente
-      <input type="date" name="fecha" required>
-    </label>
-  </div>
+  <div class="form-group"><label>Fecha del incidente
+    <input type="date" name="fecha" required></label></div>
 
-  <div class="form-group">
-    <label>Nombre</label>
+  <div class="form-group"><label>Nombre</label>
     <input id="nombreInput" name="nombre" type="text" placeholder="Ej: Juan Pérez">
-    <label class="checkbox-label">
-      <input type="checkbox" id="anon"> Confidencial
-    </label>
+    <label class="checkbox-label"><input type="checkbox" id="anon"> Confidencial</label>
   </div>
+
+  <div class="form-group"><label>Cargo
+    <input name="cargo" type="text" placeholder="Ej: Coordinador de carga"></label></div>
+
+  <div class="form-group"><label>Descripción del peligro
+    <textarea name="descripcion" rows="4" placeholder="Ej: Falla en procedimiento de estiba…" required></textarea></label></div>
+
+  <div class="form-group"><label>Evidencia (PDF/imagen/video, máx 10 MB c/u)
+    <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*"></label></div>
 
   <div class="form-group">
-    <label>Cargo
-      <input name="cargo" type="text" placeholder="Ej: Coordinador de carga">
-    </label>
-  </div>
-
-  <div class="form-group">
-    <label>Descripción del peligro
-      <textarea name="descripcion" rows="4" placeholder="Ej: Falla en procedimiento de estiba…" required></textarea>
-    </label>
-  </div>
-
-  <div class="form-group">
-    <label>Evidencia (PDF/imagen/video, máx 10 MB c/u)
-      <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*">
-    </label>
-  </div>
-
-  <div class="form-group accept-label">
-    <input type="checkbox" id="acepto" required>
-    He leído y acepto el uso y tratamiento de mis datos personales.
-  </div>
-
-  <div id="progressContainer">
-    <label>Progreso de carga:</label>
-    <div id="progressWrapper">
-      <div id="progressBar"></div>
-    </div>
-    <div id="progressPercent">0%</div>
+    <label class="accept-label"><input type="checkbox" id="acepto" required>
+      He leído y acepto el uso y tratamiento de mis datos personales.</label>
   </div>
 
   <button type="submit">Enviar reporte</button>
@@ -162,7 +147,7 @@ const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressPercent = document.getElementById('progressPercent');
 
-// Modo anónimo
+// Confidencial
 document.getElementById('anon').addEventListener('change', e => {
   const n = document.getElementById('nombreInput');
   if (e.target.checked) {
@@ -187,21 +172,23 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
 
   const d = new FormData(e.target);
   const filesInput = document.getElementById('files');
+  const anonimo = document.getElementById('anon').checked;
+  const nombreFinal = anonimo ? 'Anónimo' : (d.get('nombre') || '');
 
-  let total = 0;
-  for (const f of filesInput.files) total += f.size;
-  if (total > 15 * 1024 * 1024) {
+  // Validar tamaño total
+  let totalSize = 0;
+  for (const f of filesInput.files) totalSize += f.size;
+  if (totalSize > 15 * 1024 * 1024) {
     alert('El total de adjuntos supera 15 MB.');
     return;
   }
 
   overlay.style.display = 'flex';
-  progressContainer.style.display = 'block';
-  progressBar.style.width = '0%';
-  progressPercent.textContent = '0%';
+  if (filesInput.files.length > 0) progressContainer.style.display = 'block';
 
-  const files = [];
-  let progress = 0;
+  let files = [];
+  let uploaded = 0;
+
   for (const f of filesInput.files) {
     if (f.size > 10 * 1024 * 1024) {
       alert(`Archivo ${f.name} excede 10 MB y se omite.`);
@@ -211,8 +198,8 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
     const reader = new FileReader();
     const base64 = await new Promise(resolve => {
       reader.onload = () => {
-        progress += f.size;
-        const percent = Math.min(100, Math.round((progress / total) * 100));
+        uploaded += f.size;
+        const percent = Math.round((uploaded / totalSize) * 80); // 80% dedicado a subida de archivos
         progressBar.style.width = percent + '%';
         progressPercent.textContent = percent + '%';
         resolve(reader.result.split(',')[1]);
@@ -223,17 +210,18 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
     files.push({ name: f.name, mimeType: f.type, base64 });
   }
 
-  const isAnon = document.getElementById('anon').checked;
-  const nombreFinal = isAnon ? 'Anónimo' : (d.get('nombre') || '');
-
   const payload = {
     fecha: d.get('fecha'),
     nombre: nombreFinal,
     cargo: d.get('cargo'),
     descripcion: d.get('descripcion'),
-    anonimo: isAnon,
+    anonimo,
     files
   };
+
+  // Avance al 90%
+  progressBar.style.width = '90%';
+  progressPercent.textContent = '90%';
 
   await fetch(scriptURL, {
     method: 'POST',
@@ -241,21 +229,21 @@ document.getElementById('rpvForm').addEventListener('submit', async e => {
     body: JSON.stringify(payload)
   });
 
-  overlay.style.display = 'none';
+  // 100%
   progressBar.style.width = '100%';
   progressPercent.textContent = '100%';
 
-  alert('✅ ¡Reporte enviado!');
-  e.target.reset();
-  document.getElementById('nombreInput').disabled = false;
-  document.getElementById('nombreInput').placeholder = 'Ej: Juan Pérez';
-  document.getElementById('nombreInput').style.background = '#ffffff';
-
   setTimeout(() => {
+    overlay.style.display = 'none';
     progressContainer.style.display = 'none';
     progressBar.style.width = '0%';
     progressPercent.textContent = '0%';
-  }, 1000);
+    alert('✅ ¡Reporte enviado!');
+    e.target.reset();
+    document.getElementById('nombreInput').disabled = false;
+    document.getElementById('nombreInput').placeholder = 'Ej: Juan Pérez';
+    document.getElementById('nombreInput').style.background = '#ffffff';
+  }, 700);
 });
 </script>
 
