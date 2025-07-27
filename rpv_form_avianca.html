@@ -123,7 +123,7 @@
       font-size: 2em;
       font-weight: bold;
       margin-left: 5%;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Impact', 'Arial Black', sans-serif;
       z-index: 1;
     }
     #plane {
@@ -131,7 +131,7 @@
       left: -300px;
       width: 200px;
       z-index: 2;
-      animation: fly 3s linear forwards; /* velocidad aumentada */
+      animation: fly 3s linear forwards;
     }
     @keyframes fly {
       to { left: 100%; }
@@ -191,7 +191,7 @@ const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
 const progressPercent = document.getElementById('progressPercent');
 
-// Ocultar animación de bienvenida tras 5 segundos
+// Ocultar bienvenida tras 5s
 setTimeout(() => {
   document.getElementById('welcomeOverlay').style.display = 'none';
 }, 5000);
