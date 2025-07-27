@@ -2,54 +2,61 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RPV – Avianca Cargo</title>
-
-  <!-- Icono en pestaña -->
-  <link rel="icon" type="image/png" href="https://juancamilotibaduiza.github.io/avianca-rpv-demo/logo_avianca_cargo.png">
-
+  <link rel="icon" href="https://juancamilotibaduiza.github.io/avianca-rpv-demo/logo_avianca_cargo.png" type="image/png">
   <style>
     body {
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: "Helvetica Neue", Helvetica, Tahoma, sans-serif;
       background: #fff;
       color: #000;
       padding: 20px;
       max-width: 600px;
       margin: auto;
     }
+
     h1 {
       text-align: center;
-      color: #d52b1e;
+      color: #DA291C;
     }
+
     .logo {
       display: block;
       margin: 0 auto 20px;
       max-width: 200px;
     }
+
     .form-group {
       margin-bottom: 15px;
     }
+
     label {
       font-weight: bold;
       display: block;
       margin-bottom: 5px;
     }
-    input[type="text"], input[type="date"], textarea {
+
+    input[type="text"],
+    input[type="date"],
+    textarea {
       width: 100%;
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 5px;
       box-sizing: border-box;
     }
+
     textarea {
       resize: vertical;
     }
+
     input[type="file"] {
       border: none;
     }
+
     button {
       width: 100%;
-      background: #d52b1e;
+      background: #DA291C;
       color: #fff;
       border: none;
       border-radius: 5px;
@@ -57,22 +64,27 @@
       font-size: 16px;
       cursor: pointer;
     }
+
     button:hover {
-      background: #b9151b;
+      background: #b11417;
     }
-    .checkbox-label, .accept-label {
+
+    .checkbox-label,
+    .accept-label {
       display: flex;
       align-items: center;
       font-weight: normal;
     }
-    .checkbox-label input, .accept-label input {
+
+    .checkbox-label input,
+    .accept-label input {
       margin-right: 8px;
     }
 
     #overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.7);
+      background: rgba(0, 0, 0, .7);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -87,19 +99,22 @@
       width: 80%;
       margin-top: 20px;
     }
+
     #progressBar {
       height: 14px;
-      background-color: #d52b1e;
+      background-color: #DA291C;
       border-radius: 6px;
       width: 0%;
       transition: width 0.3s ease;
     }
+
     #progressWrapper {
       background: #eee;
       border-radius: 6px;
       overflow: hidden;
       height: 14px;
     }
+
     #progressPercent {
       text-align: right;
       font-size: 13px;
@@ -110,22 +125,21 @@
     #welcomeOverlay {
       position: fixed;
       inset: 0;
-      background: linear-gradient(to right, #d52b1e, #ffffff);
+      background: linear-gradient(to right, #DA291C, #ffffff);
       display: flex;
-      justify-content: flex-start;
       align-items: center;
       overflow: hidden;
       z-index: 999;
-      flex-direction: row;
+      padding-left: 5%;
     }
+
     #welcomeText {
-      color: white;
+      color: #fff;
       font-size: 2em;
       font-weight: bold;
-      margin-left: 5%;
-      font-family: 'Impact', 'Arial Black', sans-serif;
       z-index: 1;
     }
+
     #plane {
       position: absolute;
       left: -300px;
@@ -133,16 +147,19 @@
       z-index: 2;
       animation: fly 3s linear forwards;
     }
+
     @keyframes fly {
-      to { left: 100%; }
+      to {
+        left: 100%;
+      }
     }
   </style>
 </head>
 <body>
 
-<!-- Animación de bienvenida -->
+<!-- Pantalla de bienvenida -->
 <div id="welcomeOverlay">
-  <div id="welcomeText">Bienvenido al sistema de reporte RPV de Avianca Cargo</div>
+  <div id="welcomeText">Bienvenido al sistema RPV de Avianca Cargo</div>
   <img id="plane" src="https://juancamilotibaduiza.github.io/avianca-rpv-demo/plane_avianca.png" alt="Avión Avianca">
 </div>
 
@@ -155,142 +172,155 @@
   </div>
 </div>
 
+<!-- Logo y encabezado -->
 <img class="logo" src="https://raw.githubusercontent.com/JuanCamiloTibaduiza/avianca-rpv-demo/main/logo_avianca_cargo.png" alt="Avianca Cargo">
 <h1>REPORTE DE PELIGROS VOLUNTARIOS (RPV)</h1>
 
+<!-- Formulario -->
 <form id="rpvForm">
-  <div class="form-group"><label>Fecha del incidente
-    <input type="date" name="fecha" required></label></div>
-
-  <div class="form-group"><label>Nombre</label>
-    <input id="nombreInput" name="nombre" type="text" placeholder="Ej: Juan Pérez">
-    <label class="checkbox-label"><input type="checkbox" id="anon"> Confidencial</label>
+  <div class="form-group">
+    <label>Fecha del incidente
+      <input type="date" name="fecha" required>
+    </label>
   </div>
 
-  <div class="form-group"><label>Cargo
-    <input name="cargo" type="text" placeholder="Ej: Coordinador de carga"></label></div>
-
-  <div class="form-group"><label>Descripción del peligro
-    <textarea name="descripcion" rows="4" placeholder="Ej: Falla en procedimiento de estiba…" required></textarea></label></div>
-
-  <div class="form-group"><label>Evidencia (PDF/imagen/video, máx 10 MB c/u)
-    <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*"></label></div>
+  <div class="form-group">
+    <label>Nombre</label>
+    <input id="nombreInput" name="nombre" type="text" placeholder="Ej: Juan Pérez">
+    <label class="checkbox-label">
+      <input type="checkbox" id="anon"> Confidencial
+    </label>
+  </div>
 
   <div class="form-group">
-    <label class="accept-label"><input type="checkbox" id="acepto" required>
-      He leído y acepto el uso y tratamiento de mis datos personales.</label>
+    <label>Cargo
+      <input name="cargo" type="text" placeholder="Ej: Coordinador de carga">
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label>Descripción del peligro
+      <textarea name="descripcion" rows="4" placeholder="Ej: Falla en procedimiento de estiba…" required></textarea>
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label>Evidencia (PDF/imagen/video, máx 10 MB c/u)
+      <input name="files" id="files" type="file" multiple accept="image/*,application/pdf,video/*">
+    </label>
+  </div>
+
+  <div class="form-group">
+    <label class="accept-label">
+      <input type="checkbox" id="acepto" required>
+      He leído y acepto el uso y tratamiento de mis datos personales.
+    </label>
   </div>
 
   <button type="submit">Enviar reporte</button>
 </form>
 
 <script>
-const scriptURL = 'https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
-const overlay = document.getElementById('overlay');
-const progressContainer = document.getElementById('progressContainer');
-const progressBar = document.getElementById('progressBar');
-const progressPercent = document.getElementById('progressPercent');
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbw9xgyhX6SztqJ_1SyivfsJfZN0_TaA6vjyOQePWLbKHspPIyyYTU7Bl3-r1NjkxGWL8Q/exec';
+  const overlay = document.getElementById('overlay');
+  const progressContainer = document.getElementById('progressContainer');
+  const progressBar = document.getElementById('progressBar');
+  const progressPercent = document.getElementById('progressPercent');
 
-// Ocultar bienvenida tras 5s
-setTimeout(() => {
-  document.getElementById('welcomeOverlay').style.display = 'none';
-}, 5000);
+  // Ocultar bienvenida tras 3s
+  setTimeout(() => document.getElementById('welcomeOverlay').style.display = 'none', 3000);
 
-// Checkbox de confidencialidad
-document.getElementById('anon').addEventListener('change', e => {
-  const n = document.getElementById('nombreInput');
-  if (e.target.checked) {
-    n.value = '';
-    n.disabled = true;
-    n.placeholder = '';
-    n.style.background = '#f2f2f2';
-  } else {
-    n.disabled = false;
-    n.placeholder = 'Ej: Juan Pérez';
-    n.style.background = '#ffffff';
-  }
-});
-
-document.getElementById('rpvForm').addEventListener('submit', async e => {
-  e.preventDefault();
-
-  if (!document.getElementById('acepto').checked) {
-    alert('Debe aceptar el tratamiento de datos.');
-    return;
-  }
-
-  const d = new FormData(e.target);
-  const filesInput = document.getElementById('files');
-  const anonimo = document.getElementById('anon').checked;
-  const nombreFinal = anonimo ? 'Anónimo' : (d.get('nombre') || '');
-
-  let totalSize = 0;
-  for (const f of filesInput.files) totalSize += f.size;
-  if (totalSize > 15 * 1024 * 1024) {
-    alert('El total de adjuntos supera 15 MB.');
-    return;
-  }
-
-  overlay.style.display = 'flex';
-  if (filesInput.files.length > 0) progressContainer.style.display = 'block';
-
-  let files = [];
-  let uploaded = 0;
-
-  for (const f of filesInput.files) {
-    if (f.size > 10 * 1024 * 1024) {
-      alert(`Archivo ${f.name} excede 10 MB y se omite.`);
-      continue;
+  // Confidencialidad
+  document.getElementById('anon').addEventListener('change', e => {
+    const n = document.getElementById('nombreInput');
+    if (e.target.checked) {
+      n.value = '';
+      n.disabled = true;
+      n.placeholder = '';
+      n.style.background = '#f2f2f2';
+    } else {
+      n.disabled = false;
+      n.placeholder = 'Ej: Juan Pérez';
+      n.style.background = '#ffffff';
     }
-
-    const reader = new FileReader();
-    const base64 = await new Promise(resolve => {
-      reader.onload = () => {
-        uploaded += f.size;
-        const percent = Math.round((uploaded / totalSize) * 80);
-        progressBar.style.width = percent + '%';
-        progressPercent.textContent = percent + '%';
-        resolve(reader.result.split(',')[1]);
-      };
-      reader.readAsDataURL(f);
-    });
-
-    files.push({ name: f.name, mimeType: f.type, base64 });
-  }
-
-  const payload = {
-    fecha: d.get('fecha'),
-    nombre: nombreFinal,
-    cargo: d.get('cargo'),
-    descripcion: d.get('descripcion'),
-    anonimo,
-    files
-  };
-
-  progressBar.style.width = '90%';
-  progressPercent.textContent = '90%';
-
-  await fetch(scriptURL, {
-    method: 'POST',
-    mode: 'no-cors',
-    body: JSON.stringify(payload)
   });
 
-  progressBar.style.width = '100%';
-  progressPercent.textContent = '100%';
+  document.getElementById('rpvForm').addEventListener('submit', async e => {
+    e.preventDefault();
 
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    progressContainer.style.display = 'none';
-    progressBar.style.width = '0%';
-    progressPercent.textContent = '0%';
-    alert('✅ ¡Reporte enviado!');
-    e.target.reset();
-    document.getElementById('nombreInput').disabled = false;
-    document.getElementById('nombreInput').placeholder = 'Ej: Juan Pérez';
-    document.getElementById('nombreInput').style.background = '#ffffff';
-  }, 700);
-});
+    if (!document.getElementById('acepto').checked) {
+      alert('Debe aceptar el tratamiento de datos.');
+      return;
+    }
+
+    const d = new FormData(e.target);
+    const filesInput = document.getElementById('files');
+    const anonimo = document.getElementById('anon').checked;
+    const nombreFinal = anonimo ? 'Anónimo' : (d.get('nombre') || '');
+
+    let totalSize = 0;
+    for (const f of filesInput.files) totalSize += f.size;
+    if (totalSize > 15 * 1024 * 1024) {
+      alert('El total de adjuntos supera 15 MB.');
+      return;
+    }
+
+    overlay.style.display = 'flex';
+    if (filesInput.files.length > 0) progressContainer.style.display = 'block';
+
+    let files = [], uploaded = 0;
+    for (const f of filesInput.files) {
+      if (f.size > 10 * 1024 * 1024) {
+        alert(`Archivo ${f.name} excede 10 MB y se omite.`);
+        continue;
+      }
+      const reader = new FileReader();
+      const base64 = await new Promise(resolve => {
+        reader.onload = () => {
+          uploaded += f.size;
+          const percent = Math.round((uploaded / totalSize) * 80);
+          progressBar.style.width = percent + '%';
+          progressPercent.textContent = percent + '%';
+          resolve(reader.result.split(',')[1]);
+        };
+        reader.readAsDataURL(f);
+      });
+      files.push({ name: f.name, mimeType: f.type, base64 });
+    }
+
+    const payload = {
+      fecha: d.get('fecha'),
+      nombre: nombreFinal,
+      cargo: d.get('cargo'),
+      descripcion: d.get('descripcion'),
+      anonimo,
+      files
+    };
+
+    progressBar.style.width = '90%';
+    progressPercent.textContent = '90%';
+
+    await fetch(scriptURL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
+    });
+
+    progressBar.style.width = '100%';
+    progressPercent.textContent = '100%';
+
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+      progressPercent.textContent = '0%';
+      alert('✅ ¡Reporte enviado!');
+      e.target.reset();
+      document.getElementById('nombreInput').disabled = false;
+      document.getElementById('nombreInput').placeholder = 'Ej: Juan Pérez';
+      document.getElementById('nombreInput').style.background = '#ffffff';
+    }, 700);
+  });
 </script>
 
 </body>
